@@ -12,21 +12,27 @@ import React from 'react';
 
 export const ${componentName} = (props: SvgIconProps) => (
     <SvgIcon {...props}>
-        <path d="${pathData}" />
+        <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="${pathData}"
+        />
     </SvgIcon>
 );
 
 export default ${componentName};
 `
 
+let exportStatements = []
+
 const outDir = process.argv[2]
 const fileDirectory = process.argv[3] || outDir
 
-fs.readdir(fileDirectory, (readdirError, files) => {
+fs.readdir(fileDirectory, async (readdirError, files) => {
     if (!readdirError) {
         const svgFiles = files.filter(file => file.endsWith('.svg'))
 
-        svgFiles.forEach(file => {
+        svgFiles.forEach((file, index, array) => {
             fs.readFile(`${fileDirectory}/${file}`, (readFileError, data) => {
                 const componentName = file
                     .split(/[, \-!?:]+/)
@@ -67,6 +73,38 @@ fs.readdir(fileDirectory, (readdirError, files) => {
                                         console.log(
                                             `Successfully generated <${componentName} /> component.`
                                         )
+
+                                        exportStatements = exportStatements.concat(
+                                            `export * from './${componentName}'`
+                                        )
+
+                                        if (index === array.length - 1) {
+                                            const exportFileContent = exportStatements
+                                                .sort()
+                                                .join('\r\n')
+
+                                            if (exportFileContent) {
+                                                fs.writeFile(
+                                                    `${outDir}/index.ts`,
+                                                    Buffer.from(
+                                                        exportFileContent
+                                                    ),
+                                                    writeExportsError => {
+                                                        if (
+                                                            !writeExportsError
+                                                        ) {
+                                                            console.log(
+                                                                'Successfully generated file with export statements.'
+                                                            )
+                                                        } else {
+                                                            console.error(
+                                                                writeExportsError.message
+                                                            )
+                                                        }
+                                                    }
+                                                )
+                                            }
+                                        }
                                     } else {
                                         console.error(writeFileError.message)
                                     }
