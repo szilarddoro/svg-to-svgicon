@@ -4,15 +4,17 @@ const htmlParser = require('node-html-parser')
 const capitalizeWord = word =>
     `${word.charAt(0).toUpperCase()}${word.toLowerCase().slice(1)}`
 
-const generateFile = (componentName, pathData) => `
-import { SvgIcon, SvgIconProps } from '@material-ui/core';
+const generateFile = (
+    componentName,
+    pathData
+) => `import { SvgIcon, SvgIconProps } from '@material-ui/core';
 import React from 'react';
 
 export const ${componentName} = (props: SvgIconProps) => (
     <SvgIcon {...props}>
         <path d="${pathData}" />
     </SvgIcon>
-)
+);
 
 export default ${componentName};
 `
@@ -31,6 +33,7 @@ fs.readdir(fileDirectory, (readdirError, files) => {
                     .map(namePart =>
                         capitalizeWord(namePart.replace('.svg', ''))
                     )
+                    .concat('Icon')
                     .join('')
 
                 if (!readFileError) {
