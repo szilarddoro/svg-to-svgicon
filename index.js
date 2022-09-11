@@ -45,10 +45,9 @@ fs.readdir(fileDirectory, async (readdirError, files) => {
 
           // Get only the very first path
           const { rawAttrs } = svgData.childNodes.reduce(
-            (accumulator, data) =>
-              !accumulator
-                ? data.childNodes.find((node) => node.tagName === 'path')
-                : accumulator,
+            (accumulator, mainNode) =>
+              accumulator ||
+              mainNode.childNodes.find((node) => node.tagName === 'path'),
             null,
           );
 
