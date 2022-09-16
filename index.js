@@ -54,7 +54,7 @@ fs.readdir(fileDirectory, async (readdirError, files) => {
           const pathData = rawAttrs
             .split('" ')
             .filter((attr) => attr.startsWith('d="'))
-            .map((data) => data.replace('d="', ''))[0];
+            .map((svgPath) => svgPath.replace('d="', ''))[0];
 
           fs.mkdir(`${outDir}/${componentName}`, (mkdirError) => {
             if (!mkdirError) {
